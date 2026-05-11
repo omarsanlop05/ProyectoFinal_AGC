@@ -1,2 +1,100 @@
+// //#include "libreria.clu" // para agregar archivo como librer�a
 DefVarsN3();
 DrawFrame(0.5,"axes");
+
+//*
+//Funci�n cilindro modificada
+Cilindro = {
+	//Entrada de datos: _P(#)
+	A = _P(1); //Entrada 1: Punto inicial del cilindro
+	B = _P(2); //Entrada 2: Punto final del cilindro
+	r = _P(3); //Entrada 3: Radio del cilindro
+	
+	E = einf^e0; //Plano de Minkowski
+	Ae = (A^E)*E; //Quitar parte "conformal" a Punto A
+	Be = (B^E)*E; //Quitar parte "conformal" a Punto B
+	Ce = Be - Ae; //Vector de direcci�n en Euclidiano que va de A a B
+	C = Ce + 1/2*Ce^^2*einf + e0; // Vector Ce en conformal
+	DrawCylinder(A,C,r);
+	[C,Ce,"Hola"] // Salida(s)
+}
+
+Box = {
+	C = _P(1); // Entrada 1: Punto centro de la caja
+	X = _P(2); // Entrada 2: Punto direcci�n 1
+	Y = _P(3); // Entrada 3: Punto direcci�n 2
+	Z = _P(4); // Entrada 4: Punto direcci�n 3
+	
+	E = einf^e0; // Plano de Minwoeski
+	D1e = ((X-C)^E)*E;
+	D2e = ((Y-C)^E)*E;
+	D3e = ((Z-C)^E)*E;
+	D1 = D1e + 1/2*D1e^^2*einf + e0;
+	D2 = D2e + 1/2*D2e^^2*einf + e0;
+	D3 = D3e + 1/2*D3e^^2*einf + e0;
+	DrawBox(C,D1,D2,D3);
+}
+
+//Ejemplo: p�ndulo doble
+:IPNS;
+check = CheckBox("Animar",false);
+EnableAnimate(check);
+if(ExecMode & !EM_ANIMATE)
+{
+	Data = ReadData("");
+	?N = Size(Data);
+}
+//Numero de elementos de la lista
+?i = round(Time*200,0)%N+1;
+th1 = Data(i,1)+Pi/2;
+th2 = Data(i,2);
+
+////////////////
+X = Slider("Tras. X", -5,5,0.1,0);
+Y = Slider("Tras. Y", -5,5,0.1,0);
+Z = Slider("Tras. Z", -5,5,0.1,0);
+Xrot = Slider("Rot. X", -Pi,Pi,0.1,0);
+Yrot = Slider("Rot. Y", -Pi,Pi,0.1,0);
+Zrot = Slider("Rot. Z", -Pi,Pi,0.1,0);
+
+//Motor global
+Mg = TranslatorN3(X,Y,Z)*RotorN3(1,0,0,Xrot)*RotorN3(1,0,0,Yrot)*RotorN3(1,0,0,Zrot);
+M = Mg; //motor auxiliar "acumulado"
+
+////////////////
+
+O = M*e0*(~M); //Punto inicial (origen)
+L1 = 1; //Longitud primer p�ndulo
+//th1 = Slider("�ngulo 1", -Pi, Pi, 0.1,0); //Angulo de rotaci�n 1
+
+L2 = 1.2;
+//th2 = Slider("�ngulo 2", -Pi, Pi, 0.1,0); //�ngulo de rotaci�n 2
+
+R1 = RotorN3(0,0,1,th1);
+T1 = TranslatorN3(0,-L1,0);
+M1 = R1*T1; //Primer motor
+M = M*M1; //motor auxiliar "acumulado"
+P1 = M*e0*(~M);
+
+
+R2 = RotorN3(0,0,1,th2);
+T2 = TranslatorN3(0,-L2,0);
+M2 = R2*T2; //Segundo motor
+M = M*M2; //motor auxiliar "acumulado"
+P2 = M*e0*(~M);
+
+// Vectores para caja de "pie"
+Bx = M*VecN3(0.3,0,0)*(~M);
+By = M*VecN3(0,0.1,0)*(~M);
+Bz = M*VecN3(0,0,0.5)*(~M);
+
+:White;
+:P1 - 1/2*(0.15)^^2*einf;
+//:P2 - 1/2*(0.15)^^2*einf;
+::Box(P2,Bx,By,Bz);
+:Yellow;
+?G = ::Cilindro(O,P1,0.05);
+::Cilindro(P1,P2,0.05);
+?G(1);
+
+//*/
