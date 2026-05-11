@@ -1,0 +1,2 @@
+DefVarsN3();
+DrawFrame(0.5,"axes");
