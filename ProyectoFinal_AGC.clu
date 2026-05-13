@@ -3,7 +3,7 @@ DefVarsN3();
 DrawFrame(0.5,"axes");
 
 //*
-//Funciï¿½n cilindro modificada
+//Función cilindro modificada
 Cilindro = {
 	//Entrada de datos: _P(#)
 	A = _P(1); //Entrada 1: Punto inicial del cilindro
@@ -21,11 +21,11 @@ Cilindro = {
 
 Box = {
 	C = _P(1); // Entrada 1: Punto centro de la caja
-	X = _P(2); // Entrada 2: Punto direcciï¿½n 1
-	Y = _P(3); // Entrada 3: Punto direcciï¿½n 2
-	Z = _P(4); // Entrada 4: Punto direcciï¿½n 3
+	X = _P(2); // Entrada 2: Punto dirección 1
+	Y = _P(3); // Entrada 3: Punto dirección 2
+	Z = _P(4); // Entrada 4: Punto dirección 3
 	
-	E = einf^e0; // Plano de Minwoeski
+	E = einf^e0; // Plano de Minkowski
 	D1e = ((X-C)^E)*E;
 	D2e = ((Y-C)^E)*E;
 	D3e = ((Z-C)^E)*E;
@@ -35,40 +35,93 @@ Box = {
 	DrawBox(C,D1,D2,D3);
 }
 
-//Ejemplo: pï¿½ndulo doble
 :IPNS;
 check = CheckBox("Animar",false);
 EnableAnimate(check);
+
 if(ExecMode & !EM_ANIMATE)
 {
-	Data = ReadData("");
+	Data = ReadData("datos.dat");
 	?N = Size(Data);
 }
-//Numero de elementos de la lista
-?i = round(Time*200,0)%N+1;
-th1 = Data(i,1)+Pi/2;
-th2 = Data(i,2);
 
+if(check){
+	//Numero de elementos de la lista
+	?i = round(Time*200,0)%N+1;
+	th1 = Data(i,1)+Pi/2;
+	th2 = Data(i,2);
+} else {
 ////////////////
-X = Slider("Tras. X", -5,5,0.1,0);
-Y = Slider("Tras. Y", -5,5,0.1,0);
-Z = Slider("Tras. Z", -5,5,0.1,0);
-Xrot = Slider("Rot. X", -Pi,Pi,0.1,0);
-Yrot = Slider("Rot. Y", -Pi,Pi,0.1,0);
-Zrot = Slider("Rot. Z", -Pi,Pi,0.1,0);
+	//Movimiento general
+	BFx = Slider("Body Forward X", -5,5,0.1,0);
+	BFy = Slider("Body Forward Y", -5,5,0.1,0);
+	BFz = Slider("Body Forward Z", -5,5,0.1,0);
+	BFRx = Slider("Body Rotation X", -Pi,Pi,0.1,0);
+	BFRy = Slider("Body Rotation Y", -Pi,Pi,0.1,0);
+	BFRz = Slider("Body Rotation Z", -Pi,Pi,0.1,0);
+
+//Columna
+	LLJxr = Slider("Lumbar Rotation X", -5,5,0.1,0);
+	LLJzr = Slider("Lumbar Rotation Z", -5,5,0.1,0);
+
+//Cuello
+	LNJxr = Slider("Neck Rotation X", -5,5,0.1,0);
+	LNJyr = Slider("Neck Rotation Y", -5,5,0.1,0);
+
+//Hombro izquierdo
+	SJLxr = Slider("Left Shoulder Rotation X", -5,5,0.1,0);
+	SJLyr = Slider("Left Shoulder Rotation Y", -5,5,0.1,0);
+	SJLzr = Slider("Left Shoulder Rotation Z", -5,5,0.1,0);
+
+//Codo izquierdo
+	EJLxr = Slider("Left Elbow Rotation X", -5,5,0.1,0);
+
+//Hombro derecho
+	SJRxr = Slider("Right Shoulder Rotation X", -5,5,0.1,0);
+	SJRyr = Slider("Right Shoulder Rotation Y", -5,5,0.1,0);
+	SJRzr = Slider("Right Shoulder Rotation Z", -5,5,0.1,0);
+
+//Codo derecho
+	EJRxr = Slider("Right Elbow Rotation X", -5,5,0.1,0);
+
+//Cadera izquierda
+	HJLxr = Slider("Left Hip Rotation X", -5,5,0.1,0);
+	HJLyr = Slider("Left Hip Rotation Y", -5,5,0.1,0);
+	HJLzr = Slider("Left Hip Rotation Z", -5,5,0.1,0);
+
+//Rodilla izquierda
+	KJLxr = Slider("Left Knee Rotation X", -5,5,0.1,0);
+
+//Tobillo izquierdo
+	AJLxr = Slider("Left Anckle Rotation X", -5,5,0.1,0);
+	AJLyr = Slider("Left Anckle Rotation Y", -5,5,0.1,0);
+	AJLzr = Slider("Left Anckle Rotation Z", -5,5,0.1,0);
+
+//Cadera derecha
+	HJRxr = Slider("Right Hip Rotation X", -5,5,0.1,0);
+	HJRyr = Slider("Right Hip Rotation Y", -5,5,0.1,0);
+	HJRzr = Slider("Right Hip Rotation Z", -5,5,0.1,0);
+
+//Rodilla derecha
+	KJRxr = Slider("Right Knee Rotation X", -5,5,0.1,0);
+
+//Tobillo derecho
+	AJRxr = Slider("Right Anckle Rotation X", -5,5,0.1,0);
+	AJRyr = Slider("Right Anckle Rotation Y", -5,5,0.1,0);
+	AJRzr = Slider("Right Anckle Rotation Z", -5,5,0.1,0);
+}
+////////////////
 
 //Motor global
-Mg = TranslatorN3(X,Y,Z)*RotorN3(1,0,0,Xrot)*RotorN3(1,0,0,Yrot)*RotorN3(1,0,0,Zrot);
+Mg = TranslatorN3(BFx,BFy,BFz)*RotorN3(1,0,0,BFRx)*RotorN3(1,0,0,BFRy)*RotorN3(1,0,0,BFRz);
 M = Mg; //motor auxiliar "acumulado"
 
-////////////////
-
 O = M*e0*(~M); //Punto inicial (origen)
-L1 = 1; //Longitud primer pï¿½ndulo
-//th1 = Slider("ï¿½ngulo 1", -Pi, Pi, 0.1,0); //Angulo de rotaciï¿½n 1
+L1 = 1; //Longitud primer péndulo
+//th1 = Slider("Ángulo 1", -Pi, Pi, 0.1,0); //Angulo de rotación 1
 
 L2 = 1.2;
-//th2 = Slider("ï¿½ngulo 2", -Pi, Pi, 0.1,0); //ï¿½ngulo de rotaciï¿½n 2
+//th2 = Slider("Ángulo 2", -Pi, Pi, 0.1,0); //ï¿½ngulo de rotación 2
 
 R1 = RotorN3(0,0,1,th1);
 T1 = TranslatorN3(0,-L1,0);
