@@ -1,4 +1,3 @@
-// //#include "libreria.clu" // para agregar archivo como librerï¿½a
 DefVarsN3();
 DrawFrame(0.5,"axes");
 
@@ -46,10 +45,67 @@ if(ExecMode & !EM_ANIMATE)
 }
 
 if(check){
-	//Numero de elementos de la lista
+//Numero de elementos de la lista
 	?i = round(Time*200,0)%N+1;
-	th1 = Data(i,1)+Pi/2;
-	th2 = Data(i,2);
+	
+////////////////
+//Movimiento general
+	BFx = Data(i,1);
+	BFy = Data(i,2);
+	BFz = Data(i,3);
+	BFRx = Data(i,4);
+	BFRy = Data(i,5);
+	BFRz = Data(i,6);
+
+//Columna
+	LLJxr = Data(i,7);
+	LLJzr = Data(i,8);
+
+//Cuello
+	LNJxr = Data(i,9);
+	LNJyr = Data(i,10);
+
+//Hombro izquierdo
+	SJLxr = Data(i,11);
+	SJLyr = Data(i,12);
+	SJLzr = Data(i,13);
+
+//Codo izquierdo
+	EJLxr = Data(i,14);
+
+//Hombro derecho
+	SJRxr = Data(i,15);
+	SJRyr = Data(i,16);
+	SJRzr = Data(i,17);
+
+//Codo derecho
+	EJRxr = Data(i,18);
+
+//Cadera izquierda
+	HJLxr = Data(i,19);
+	HJLyr = Data(i,20);
+	HJLzr = Data(i,21);
+
+//Rodilla izquierda
+	KJLxr = Data(i,22);
+
+//Tobillo izquierdo
+	AJLxr = Data(i,23);
+	AJLyr = Data(i,24);
+	AJLzr = Data(i,25);
+
+//Cadera derecha
+	HJRxr = Data(i,26);
+	HJRyr = Data(i,27);
+	HJRzr = Data(i,28);
+
+//Rodilla derecha
+	KJRxr = Data(i,29);
+
+//Tobillo derecho
+	AJRxr = Data(i,30);
+	AJRyr = Data(i,31);
+	AJRzr = Data(i,32);
 } else {
 ////////////////
 	//Movimiento general
@@ -113,28 +169,102 @@ if(check){
 ////////////////
 
 //Motor global
-Mg = TranslatorN3(BFx,BFy,BFz)*RotorN3(1,0,0,BFRx)*RotorN3(1,0,0,BFRy)*RotorN3(1,0,0,BFRz);
+Mg = TranslatorN3(BFx,BFy,BFz)*RotorN3(1,0,0,BFRx)*RotorN3(0,1,0,BFRy)*RotorN3(1,0,0,BFRz);
 M = Mg; //motor auxiliar "acumulado"
 
-O = M*e0*(~M); //Punto inicial (origen)
-L1 = 1; //Longitud primer péndulo
-//th1 = Slider("Ángulo 1", -Pi, Pi, 0.1,0); //Angulo de rotación 1
+////////////////
 
-L2 = 1.2;
-//th2 = Slider("Ángulo 2", -Pi, Pi, 0.1,0); //ï¿½ngulo de rotación 2
+// Cuerpo
+x = 1; // Escala 1 = mm
+PuntoTorso = M*e0*(~M); //Punto inicial (origen)
+Lt = 409.4*x;   // torso
+Ln = 120*x;		// cuello
+Ls = 176.3*x;   // hombros
+La = 239.3*x;   // brazo
+Lf = 250*x;     // antebrazo
+Lh = 186.7*x; 	// ancho cadera
+Hh = 119.8*x; 	// altura cadera
+Lp = 380.6*x;   // pierna
+Lc = 358.6*x;   // pantorrilla
+Sk = 207.9*x;   // separación rodillas
+Sa = 211.6*x;   // separación tobillos
+Hf = 71.8*x;	// altura pues
 
-R1 = RotorN3(0,0,1,th1);
-T1 = TranslatorN3(0,-L1,0);
-M1 = R1*T1; //Primer motor
-M = M*M1; //motor auxiliar "acumulado"
-P1 = M*e0*(~M);
+// Movimiento lumbar
+Rlumbar = RotorN3(1,0,0,LLJxr)*RotorN3(0,0,1,LLJzr);
+Tlumbar = TranslatorN3(0,Lt,0);
+Mlumbar = Rlumbar * Tlumbar;
+Mtorso = M * Mlumbar;
+Pchest = Mtorso * e0 * (~Mtorso);
 
+// Movimiento cuello
+Rneck = RotorN3(1,0,0,LNJxr)*RotorN3(0,1,0,LNJyr);
+Tneck = TranslatorN3(0,Ln,0);
+Mneck = Mtorso * Rneck * Tneck;
+Phead = Mneck * e0 * (~Mneck);
 
-R2 = RotorN3(0,0,1,th2);
-T2 = TranslatorN3(0,-L2,0);
-M2 = R2*T2; //Segundo motor
-M = M*M2; //motor auxiliar "acumulado"
-P2 = M*e0*(~M);
+// Movimiento brazo izquierdo
+// Hombro izquierdo
+TshoulderL = TranslatorN3(-0.5, Lt, 0);
+RshoulderL = RotorN3(1,0,0,SJLxr)*RotorN3(0,1,0,SJLyr)*RotorN3(0,0,1,SJLzr);
+TarmL = TranslatorN3(0,-La,0);
+MarmL = M * TshoulderL * RshoulderL * TarmL;
+PelbowL = MarmL * e0 * (~MarmL);
+
+// Codo izquierdo
+RelbowL = RotorN3(1,0,0,EJLxr);
+TforearmL = TranslatorN3(0,-Lf,0);
+MforearmL = MarmL * RelbowL * TforearmL;
+PhandL = MforearmL * e0 * (~MforearmL);
+
+// Movimiento brazo derecho
+// Hombro derecho
+TshoulderL = TranslatorN3(-0.5, Lt, 0);
+RshoulderL = RotorN3(1,0,0,SJLxr)*RotorN3(0,1,0,SJLyr)*RotorN3(0,0,1,SJLzr);
+TarmL = TranslatorN3(0,-La,0);
+MarmL = M * TshoulderL * RshoulderL * TarmL;
+PelbowL = MarmL * e0 * (~MarmL);
+
+// Codo derecho
+RelbowL = RotorN3(1,0,0,EJLxr);
+TforearmL = TranslatorN3(0,-Lf,0);
+MforearmL = MarmL * RelbowL * TforearmL;
+PhandL = MforearmL * e0 * (~MforearmL);
+
+// Cadera
+ThipL = TranslatorN3(-0.3,0,0);
+RhipL = RotorN3(1,0,0,HJLxr)*RotorN3(0,1,0,HJLyr)*RotorN3(0,0,1,HJLzr);
+
+// Movimiento piernas
+// Pierna izquierda
+TlegL = TranslatorN3(0,-Lp,0);
+MlegL = M * ThipL * RhipL * TlegL;
+PkneeL = MlegL * e0 * (~MlegL);
+
+// Rodilla izquierda
+RkneeL = RotorN3(1,0,0,KJLxr);
+TcalfL = TranslatorN3(0,-Lc,0);
+McalfL = MlegL * RkneeL * TcalfL;
+PankleL = McalfL * e0 * (~McalfL);
+
+// Dibujo cuerpo
+// Cabeza
+Color(1,0.8,0.6);
+DrawSphere(Phead,0.25);
+
+// Torso
+Color(0.7,0.7,0.7);
+Cilindro(Ptorso,Pchest,0.15);
+
+// Brazo
+Color(0,0,1);
+Cilindro(PshoulderL,PelbowL,0.08);
+Cilindro(PelbowL,PhandL,0.06);
+
+// Pierna
+Color(1,0,0);
+Cilindro(PhipL,PkneeL,0.1);
+Cilindro(PkneeL,PankleL,0.08);
 
 // Vectores para caja de "pie"
 Bx = M*VecN3(0.3,0,0)*(~M);
