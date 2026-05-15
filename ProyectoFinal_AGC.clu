@@ -1,158 +1,283 @@
-DefVarsN3(); 
-DrawFrame(0.5, "axes"); 
+DefVarsN3();
+DrawFrame(0.5,"axes");
 
-// Funcion de clase
-Cilindro =
-{
-    A = _P(1); B = _P(2); r = _P(3);
-    E = einf^e0; 
-    Ae = (A^E)*E; 
-    Be = (B^E)*E; 
-    Ce = Be - Ae; 
-    C = Ce + 1/2*Ce^^2*einf + e0; 
-    DrawCylinder(A, C, r);
+//*
+//Función cilindro modificada
+Cilindro = {
+	//Entrada de datos: _P(#)
+	A = _P(1); //Entrada 1: Punto inicial del cilindro
+	B = _P(2); //Entrada 2: Punto final del cilindro
+	r = _P(3); //Entrada 3: Radio del cilindro
+	
+	E = einf^e0; //Plano de Minkowski
+	Ae = (A^E)*E; //Quitar parte "conformal" a Punto A
+	Be = (B^E)*E; //Quitar parte "conformal" a Punto B
+	Ce = Be - Ae; //Vector de direcciï¿½n en Euclidiano que va de A a B
+	C = Ce + 1/2*Ce^^2*einf + e0; // Vector Ce en conformal
+	DrawCylinder(A,C,r);
+	[C,Ce,"Hola"] // Salida(s)
 }
 
-// =========================================================================
-// LÓGICA DE ANIMACIÓN
-// =========================================================================
+Box = {
+	C = _P(1); // Entrada 1: Punto centro de la caja
+	X = _P(2); // Entrada 2: Punto dirección 1
+	Y = _P(3); // Entrada 3: Punto dirección 2
+	Z = _P(4); // Entrada 4: Punto dirección 3
+	
+	E = einf^e0; // Plano de Minkowski
+	D1e = ((X-C)^E)*E;
+	D2e = ((Y-C)^E)*E;
+	D3e = ((Z-C)^E)*E;
+	D1 = D1e + 1/2*D1e^^2*einf + e0;
+	D2 = D2e + 1/2*D2e^^2*einf + e0;
+	D3 = D3e + 1/2*D3e^^2*einf + e0;
+	DrawBox(C,D1,D2,D3);
+}
+
 :IPNS;
-EnableAnimate(CheckBox("Animar", 0));
+check = CheckBox("Animar",false);
+EnableAnimate(check);
 
 if(ExecMode & !EM_ANIMATE)
 {
-    Data = ReadData("datos.dat");
-    ?N = Size(Data);
+	Data = ReadData("datos.dat");
+	?N = Size(Data);
 }
 
-// Índice de animación
-?i = round(Time*200, 0)%N + 1;
+if(check){
+//Numero de elementos de la lista
+	?i = round(Time*200,0)%N+1;
+	
+////////////////
+//Movimiento general
+	BFx = Data(i,1);
+	BFy = Data(i,2);
+	BFz = Data(i,3);
+	BFRx = Data(i,4);
+	BFRy = Data(i,5);
+	BFRz = Data(i,6);
 
-// =========================================================================
-// SLIDERS 
-// =========================================================================
+//Columna
+	LLJxr = Data(i,7);
+	LLJzr = Data(i,8);
 
-// Cuerpo Global y Tronco
-px = Slider("Pos X", -5, 5, 0.1, 0);
-py = Slider("Pos Y", 0, 10, 0.1, 8.1);
-pz = Slider("Pos Z", -5, 5, 0.1, 0);
-BFx = Slider("Cintura X (BFx)", -0.8, 0.8, 0.01, 0);
-BFz = Slider("Cintura Z (BFz)", -0.5, 0.5, 0.01, 0);
+//Cuello
+	LNJxr = Data(i,9);
+	LNJyr = Data(i,10);
 
-// Cuello 
-LNJxr = Slider("Cuello X", -0.7, 0.7, 0.1, 0);
-LNJyr = Slider("Cuello Y", -1.2, 1.2, 0.1, 0);
+//Hombro izquierdo
+	SJLxr = Data(i,11);
+	SJLyr = Data(i,12);
+	SJLzr = Data(i,13);
 
-// Brazo Izquierdo (L)
-SJLxr = Slider("Hombro L X", -Pi, Pi, 0.1, 0);
-SJLyr = Slider("Hombro L Y", -1.5, 1.5, 0.1, 0);
-SJLzr = Slider("Hombro L Z", -Pi, 0.5, 0.1, 0);
-EJLxr = Slider("Codo L X", -2.5, 0, 0.1, 0);
+//Codo izquierdo
+	EJLxr = Data(i,14);
 
-// Brazo Derecho (R)
-SJRxr = Slider("Hombro R X", -Pi, Pi, 0.1, 0);
-SJRyr = Slider("Hombro R Y", -1.5, 1.5, 0.1, 0);
-SJRzr = Slider("Hombro R Z", -0.5, Pi, 0.1, 0);
-EJRxr = Slider("Codo R X", -2.5, 0, 0.1, 0);
+//Hombro derecho
+	SJRxr = Data(i,15);
+	SJRyr = Data(i,16);
+	SJRzr = Data(i,17);
 
-// Pierna Izquierda (L) 
-HJLxr = Slider("Cadera L X", -1.5, 0.5, 0.1, 0);
-HJLyr = Slider("Cadera L Y", -0.5, 0.5, 0.1, 0); 
-HJLzr = Slider("Cadera L Z", -0.5, 0.5, 0.1, 0); 
-KJLxr = Slider("Rodilla L X", 0, 2.5, 0.1, 0);
-AJLxr = Slider("Tobillo L X", -0.8, 0.8, 0.1, 0); 
-AJLyr = Slider("Tobillo L Y", -0.5, 0.5, 0.1, 0); 
-AJLzr = Slider("Tobillo L Z", -0.5, 0.5, 0.1, 0); 
+//Codo derecho
+	EJRxr = Data(i,18);
 
-// Pierna Derecha (R)
-HJRxr = Slider("Cadera R X", -1.5, 0.5, 0.1, 0);
-HJRyr = Slider("Cadera R Y", -0.5, 0.5, 0.1, 0); 
-HJRzr = Slider("Cadera R Z", -0.5, 0.5, 0.1, 0); 
-KJRxr = Slider("Rodilla R X", 0, 2.5, 0.1, 0);
-AJRxr = Slider("Tobillo R X", -0.8, 0.8, 0.1, 0); 
-AJRyr = Slider("Tobillo R Y", -0.5, 0.5, 0.1, 0); 
-AJRzr = Slider("Tobillo R Z", -0.5, 0.5, 0.1, 0); 
+//Cadera izquierda
+	HJLxr = Data(i,19);
+	HJLyr = Data(i,20);
+	HJLzr = Data(i,21);
 
-// Mapeo de datos (Si el checkbox está activo)
-if (CheckBox("Animar")) {
-    BFx = Data(i, 1);
-    BFz = Data(i, 2);
-    SJLxr = Data(i, 3);
+//Rodilla izquierda
+	KJLxr = Data(i,22);
+
+//Tobillo izquierdo
+	AJLxr = Data(i,23);
+	AJLyr = Data(i,24);
+	AJLzr = Data(i,25);
+
+//Cadera derecha
+	HJRxr = Data(i,26);
+	HJRyr = Data(i,27);
+	HJRzr = Data(i,28);
+
+//Rodilla derecha
+	KJRxr = Data(i,29);
+
+//Tobillo derecho
+	AJRxr = Data(i,30);
+	AJRyr = Data(i,31);
+	AJRzr = Data(i,32);
+} else {
+////////////////
+	//Movimiento general
+	BFx = Slider("Body Forward X", -5,5,0.1,0);
+	BFy = Slider("Body Forward Y", -5,5,0.1,0);
+	BFz = Slider("Body Forward Z", -5,5,0.1,0);
+	BFRx = Slider("Body Rotation X", -Pi,Pi,0.1,0);
+	BFRy = Slider("Body Rotation Y", -Pi,Pi,0.1,0);
+	BFRz = Slider("Body Rotation Z", -Pi,Pi,0.1,0);
+
+//Columna
+	LLJxr = Slider("Lumbar Rotation X", -5,5,0.1,0);
+	LLJzr = Slider("Lumbar Rotation Z", -5,5,0.1,0);
+
+//Cuello
+	LNJxr = Slider("Neck Rotation X", -5,5,0.1,0);
+	LNJyr = Slider("Neck Rotation Y", -5,5,0.1,0);
+
+//Hombro izquierdo
+	SJLxr = Slider("Left Shoulder Rotation X", -5,5,0.1,0);
+	SJLyr = Slider("Left Shoulder Rotation Y", -5,5,0.1,0);
+	SJLzr = Slider("Left Shoulder Rotation Z", -5,5,0.1,0);
+
+//Codo izquierdo
+	EJLxr = Slider("Left Elbow Rotation X", -5,5,0.1,0);
+
+//Hombro derecho
+	SJRxr = Slider("Right Shoulder Rotation X", -5,5,0.1,0);
+	SJRyr = Slider("Right Shoulder Rotation Y", -5,5,0.1,0);
+	SJRzr = Slider("Right Shoulder Rotation Z", -5,5,0.1,0);
+
+//Codo derecho
+	EJRxr = Slider("Right Elbow Rotation X", -5,5,0.1,0);
+
+//Cadera izquierda
+	HJLxr = Slider("Left Hip Rotation X", -5,5,0.1,0);
+	HJLyr = Slider("Left Hip Rotation Y", -5,5,0.1,0);
+	HJLzr = Slider("Left Hip Rotation Z", -5,5,0.1,0);
+
+//Rodilla izquierda
+	KJLxr = Slider("Left Knee Rotation X", -5,5,0.1,0);
+
+//Tobillo izquierdo
+	AJLxr = Slider("Left Anckle Rotation X", -5,5,0.1,0);
+	AJLyr = Slider("Left Anckle Rotation Y", -5,5,0.1,0);
+	AJLzr = Slider("Left Anckle Rotation Z", -5,5,0.1,0);
+
+//Cadera derecha
+	HJRxr = Slider("Right Hip Rotation X", -5,5,0.1,0);
+	HJRyr = Slider("Right Hip Rotation Y", -5,5,0.1,0);
+	HJRzr = Slider("Right Hip Rotation Z", -5,5,0.1,0);
+
+//Rodilla derecha
+	KJRxr = Slider("Right Knee Rotation X", -5,5,0.1,0);
+
+//Tobillo derecho
+	AJRxr = Slider("Right Anckle Rotation X", -5,5,0.1,0);
+	AJRyr = Slider("Right Anckle Rotation Y", -5,5,0.1,0);
+	AJRzr = Slider("Right Anckle Rotation Z", -5,5,0.1,0);
 }
+////////////////
 
-// =========================================================================
-// CINEMÁTICA
-// =========================================================================
-s = 0.01; // Escala para que se vea en pantalla
+//Motor global
+Mg = TranslatorN3(BFx,BFy,BFz)*RotorN3(1,0,0,BFRx)*RotorN3(0,1,0,BFRy)*RotorN3(1,0,0,BFRz);
+M = Mg; //motor auxiliar "acumulado"
 
-// Motor Raíz (Pelvis)
-M_global = TranslatorN3(px, py, pz);
-P_pelvis = M_global * e0 * (~M_global);
+////////////////
 
-// Tronco
-M_trunk = M_global * TranslatorN3(0, 119.8*s, 0) * RotorN3(1,0,0, BFx) * RotorN3(0,0,1, BFz);
-P_trunk = M_trunk * e0 * (~M_trunk);
-M_neck = M_trunk * TranslatorN3(0, 409.4*s, 0);
-P_neck = M_neck * e0 * (~M_neck);
+// Cuerpo
+x = 1; // Escala 1 = mm
+PuntoTorso = M*e0*(~M); //Punto inicial (origen)
+Lt = 409.4*x;   // torso
+Ln = 120*x;		// cuello
+Ls = 176.3*x;   // hombros
+La = 239.3*x;   // brazo
+Lf = 250*x;     // antebrazo
+Lh = 186.7*x; 	// ancho cadera
+Hh = 119.8*x; 	// altura cadera
+Lp = 380.6*x;   // pierna
+Lc = 358.6*x;   // pantorrilla
+Sk = 207.9*x;   // separación rodillas
+Sa = 211.6*x;   // separación tobillos
+Hf = 71.8*x;	// altura pues
 
-// CABEZA
-M_headBase = M_neck * RotorN3(1,0,0, LNJxr) * RotorN3(0,1,0, LNJyr);
-P_head = (M_headBase * TranslatorN3(0, 150*s, 0)) * e0 * (~(M_headBase * TranslatorN3(0, 150*s, 0))); // 150mm arriba del cuello
+// Movimiento lumbar
+Rlumbar = RotorN3(1,0,0,LLJxr)*RotorN3(0,0,1,LLJzr);
+Tlumbar = TranslatorN3(0,Lt,0);
+Mlumbar = Rlumbar * Tlumbar;
+Mtorso = M * Mlumbar;
+Pchest = Mtorso * e0 * (~Mtorso);
 
-// BRAZO IZQUIERDO (L)
-M_armL = M_neck * TranslatorN3(-176.3*s, 0, 0) * RotorN3(1,0,0, SJLxr) * RotorN3(0,1,0, SJLyr) * RotorN3(0,0,1, SJLzr);
-P_SJ_L = M_armL * e0 * (~M_armL); 
-M_forearmL = M_armL * TranslatorN3(0, -239.3*s, 0) * RotorN3(1,0,0, EJLxr);
-P_EJ_L = M_forearmL * e0 * (~M_forearmL); 
-P_handL = (M_forearmL * TranslatorN3(0, -250*s, 0)) * e0 * (~(M_forearmL * TranslatorN3(0, -250*s, 0)));
+// Movimiento cuello
+Rneck = RotorN3(1,0,0,LNJxr)*RotorN3(0,1,0,LNJyr);
+Tneck = TranslatorN3(0,Ln,0);
+Mneck = Mtorso * Rneck * Tneck;
+Phead = Mneck * e0 * (~Mneck);
 
-// BRAZO DERECHO (R) 
-M_armR = M_neck * TranslatorN3(176.3*s, 0, 0) * RotorN3(1,0,0, SJRxr) * RotorN3(0,1,0, SJRyr) * RotorN3(0,0,1, SJRzr);
-P_SJ_R = M_armR * e0 * (~M_armR); 
-M_forearmR = M_armR * TranslatorN3(0, -239.3*s, 0) * RotorN3(1,0,0, EJRxr);
-P_EJ_R = M_forearmR * e0 * (~M_forearmR);
-P_handR = (M_forearmR * TranslatorN3(0, -250*s, 0)) * e0 * (~(M_forearmR * TranslatorN3(0, -250*s, 0)));
+// Movimiento brazo izquierdo
+// Hombro izquierdo
+TshoulderL = TranslatorN3(-0.5, Lt, 0);
+RshoulderL = RotorN3(1,0,0,SJLxr)*RotorN3(0,1,0,SJLyr)*RotorN3(0,0,1,SJLzr);
+TarmL = TranslatorN3(0,-La,0);
+MarmL = M * TshoulderL * RshoulderL * TarmL;
+PelbowL = MarmL * e0 * (~MarmL);
 
-// PIERNA IZQUIERDA (L) 
-M_legL = M_global * TranslatorN3(-93.35*s, 0, 0) * RotorN3(1,0,0, HJLxr) * RotorN3(0,1,0, HJLyr) * RotorN3(0,0,1, HJLzr);
-P_HJ_L = M_legL * e0 * (~M_legL);
-M_kneeL = M_legL * TranslatorN3(0, -380.6*s, 0) * RotorN3(1,0,0, KJLxr);
-P_KJ_L = M_kneeL * e0 * (~M_kneeL);
-M_ankleL = M_kneeL * TranslatorN3(0, -358.6*s, 0) * RotorN3(1,0,0, AJLxr) * RotorN3(0,1,0, AJLyr) * RotorN3(0,0,1, AJLzr);
-P_AJ_L = M_ankleL * e0 * (~M_ankleL);
-P_footL = (M_ankleL * TranslatorN3(0, -71.8*s, 0)) * e0 * (~(M_ankleL * TranslatorN3(0, -71.8*s, 0)));
+// Codo izquierdo
+RelbowL = RotorN3(1,0,0,EJLxr);
+TforearmL = TranslatorN3(0,-Lf,0);
+MforearmL = MarmL * RelbowL * TforearmL;
+PhandL = MforearmL * e0 * (~MforearmL);
 
-// PIERNA DERECHA (R) 
-M_legR = M_global * TranslatorN3(93.35*s, 0, 0) * RotorN3(1,0,0, HJRxr) * RotorN3(0,1,0, HJRyr) * RotorN3(0,0,1, HJRzr);
-P_HJ_R = M_legR * e0 * (~M_legR);
-M_kneeR = M_legR * TranslatorN3(0, -380.6*s, 0) * RotorN3(1,0,0, KJRxr);
-P_KJ_R = M_kneeR * e0 * (~M_kneeR);
-M_ankleR = M_kneeR * TranslatorN3(0, -358.6*s, 0) * RotorN3(1,0,0, AJRxr) * RotorN3(0,1,0, AJRyr) * RotorN3(0,0,1, AJRzr);
-P_AJ_R = M_ankleR * e0 * (~M_ankleR);
-P_footR = (M_ankleR * TranslatorN3(0, -71.8*s, 0)) * e0 * (~(M_ankleR * TranslatorN3(0, -71.8*s, 0)));
+// Movimiento brazo derecho
+// Hombro derecho
+TshoulderL = TranslatorN3(-0.5, Lt, 0);
+RshoulderL = RotorN3(1,0,0,SJLxr)*RotorN3(0,1,0,SJLyr)*RotorN3(0,0,1,SJLzr);
+TarmL = TranslatorN3(0,-La,0);
+MarmL = M * TshoulderL * RshoulderL * TarmL;
+PelbowL = MarmL * e0 * (~MarmL);
 
-// =========================================================================
-// DIBUJO 
-// =========================================================================
-Color(1,0,0); // Rojo para articulaciones
-DrawSphere(P_pelvis, 0.05); DrawSphere(P_trunk, 0.05); DrawSphere(P_neck, 0.05);
-DrawSphere(P_SJ_L, 0.04); DrawSphere(P_EJ_L, 0.04); 
-DrawSphere(P_SJ_R, 0.04); DrawSphere(P_EJ_R, 0.04);
-DrawSphere(P_HJ_L, 0.04); DrawSphere(P_KJ_L, 0.04); DrawSphere(P_AJ_L, 0.04);
-DrawSphere(P_HJ_R, 0.04); DrawSphere(P_KJ_R, 0.04); DrawSphere(P_AJ_R, 0.04);
+// Codo derecho
+RelbowL = RotorN3(1,0,0,EJLxr);
+TforearmL = TranslatorN3(0,-Lf,0);
+MforearmL = MarmL * RelbowL * TforearmL;
+PhandL = MforearmL * e0 * (~MforearmL);
 
-Color(0.8, 0.8, 0.8); // Color diferente para cabeza y extremidades finales
-DrawSphere(P_head, 0.12); 
-DrawSphere(P_handL, 0.03); DrawSphere(P_handR, 0.03);
+// Cadera
+ThipL = TranslatorN3(-0.3,0,0);
+RhipL = RotorN3(1,0,0,HJLxr)*RotorN3(0,1,0,HJLyr)*RotorN3(0,0,1,HJLzr);
 
-Color(0,0.5,1); // Azul para huesos
-Cilindro(P_pelvis, P_trunk, 0.04);
-Cilindro(P_trunk, P_neck, 0.04);
+// Movimiento piernas
+// Pierna izquierda
+TlegL = TranslatorN3(0,-Lp,0);
+MlegL = M * ThipL * RhipL * TlegL;
+PkneeL = MlegL * e0 * (~MlegL);
 
-// Brazos
-Cilindro(P_neck, P_SJ_L, 0.03); Cilindro(P_SJ_L, P_EJ_L, 0.03); Cilindro(P_EJ_L, P_handL, 0.02);
-Cilindro(P_neck, P_SJ_R, 0.03); Cilindro(P_SJ_R, P_EJ_R, 0.03); Cilindro(P_EJ_R, P_handR, 0.02);
+// Rodilla izquierda
+RkneeL = RotorN3(1,0,0,KJLxr);
+TcalfL = TranslatorN3(0,-Lc,0);
+McalfL = MlegL * RkneeL * TcalfL;
+PankleL = McalfL * e0 * (~McalfL);
 
-// Piernas 
-Cilindro(P_pelvis, P_HJ_L, 0.03); Cilindro(P_HJ_L, P_KJ_L, 0.03); Cilindro(P_KJ_L, P_AJ_L, 0.02); Cilindro(P_AJ_L, P_footL, 0.02);
-Cilindro(P_pelvis, P_HJ_R, 0.03); Cilindro(P_HJ_R, P_KJ_R, 0.03); Cilindro(P_KJ_R, P_AJ_R, 0.02); Cilindro(P_AJ_R, P_footR, 0.02);
+// Dibujo cuerpo
+// Cabeza
+Color(1,0.8,0.6);
+DrawSphere(Phead,0.25);
+
+// Torso
+Color(0.7,0.7,0.7);
+Cilindro(Ptorso,Pchest,0.15);
+
+// Brazo
+Color(0,0,1);
+Cilindro(PshoulderL,PelbowL,0.08);
+Cilindro(PelbowL,PhandL,0.06);
+
+// Pierna
+Color(1,0,0);
+Cilindro(PhipL,PkneeL,0.1);
+Cilindro(PkneeL,PankleL,0.08);
+
+// Vectores para caja de "pie"
+Bx = M*VecN3(0.3,0,0)*(~M);
+By = M*VecN3(0,0.1,0)*(~M);
+Bz = M*VecN3(0,0,0.5)*(~M);
+
+:White;
+:P1 - 1/2*(0.15)^^2*einf;
+//:P2 - 1/2*(0.15)^^2*einf;
+::Box(P2,Bx,By,Bz);
+:Yellow;
+?G = ::Cilindro(O,P1,0.05);
+::Cilindro(P1,P2,0.05);
+?G(1);
+
+//*/
