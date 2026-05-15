@@ -175,8 +175,8 @@ M = Mg; //motor auxiliar "acumulado"
 ////////////////
 
 // Cuerpo
-x = 1; // Escala 1 = mm
-PuntoTorso = M*e0*(~M); //Punto inicial (origen)
+x = 0.01; // Escala 1 = mm
+Ptorso = M*e0*(~M); //Punto inicial (origen)
 Lt = 409.4*x;   // torso
 Ln = 120*x;		// cuello
 Ls = 176.3*x;   // hombros
@@ -209,6 +209,7 @@ TshoulderL = TranslatorN3(-0.5, Lt, 0);
 RshoulderL = RotorN3(1,0,0,SJLxr)*RotorN3(0,1,0,SJLyr)*RotorN3(0,0,1,SJLzr);
 TarmL = TranslatorN3(0,-La,0);
 MarmL = M * TshoulderL * RshoulderL * TarmL;
+PshoulderL = (M * TshoulderL) * e0 * (~(M * TshoulderL));
 PelbowL = MarmL * e0 * (~MarmL);
 
 // Codo izquierdo
@@ -219,21 +220,26 @@ PhandL = MforearmL * e0 * (~MforearmL);
 
 // Movimiento brazo derecho
 // Hombro derecho
-TshoulderL = TranslatorN3(-0.5, Lt, 0);
-RshoulderL = RotorN3(1,0,0,SJLxr)*RotorN3(0,1,0,SJLyr)*RotorN3(0,0,1,SJLzr);
-TarmL = TranslatorN3(0,-La,0);
-MarmL = M * TshoulderL * RshoulderL * TarmL;
-PelbowL = MarmL * e0 * (~MarmL);
+TshoulderR = TranslatorN3(0.5, Lt, 0);
+RshoulderR = RotorN3(1,0,0,SJRxr)*RotorN3(0,1,0,SJRyr)*RotorN3(0,0,1,SJRzr);
+TarmR = TranslatorN3(0,-La,0);
+MarmR = M * TshoulderR * RshoulderR * TarmR;
+PshoulderR = (M * TshoulderR) * e0 * (~(M * TshoulderR));
+PelbowR = MarmR * e0 * (~MarmR);
 
 // Codo derecho
-RelbowL = RotorN3(1,0,0,EJLxr);
-TforearmL = TranslatorN3(0,-Lf,0);
-MforearmL = MarmL * RelbowL * TforearmL;
-PhandL = MforearmL * e0 * (~MforearmL);
+RelbowR = RotorN3(1,0,0,EJRxr);
+TforearmR = TranslatorN3(0,-Lf,0);
+MforearmR = MarmR * RelbowR * TforearmR;
+PhandR = MforearmR * e0 * (~MforearmR);
 
 // Cadera
 ThipL = TranslatorN3(-0.3,0,0);
 RhipL = RotorN3(1,0,0,HJLxr)*RotorN3(0,1,0,HJLyr)*RotorN3(0,0,1,HJLzr);
+PhipL = (M * ThipL) * e0 * (~(M * ThipL));
+ThipR = TranslatorN3(0.3,0,0); // 0.3 positivo
+RhipR = RotorN3(1,0,0,HJRxr)*RotorN3(0,1,0,HJRyr)*RotorN3(0,0,1,HJRzr);
+PhipR = (M * ThipR) * e0 * (~(M * ThipR));
 
 // Movimiento piernas
 // Pierna izquierda
@@ -247,37 +253,75 @@ TcalfL = TranslatorN3(0,-Lc,0);
 McalfL = MlegL * RkneeL * TcalfL;
 PankleL = McalfL * e0 * (~McalfL);
 
+// Tobillo y pie izquierdo
+RankleL = RotorN3(1,0,0,AJLxr)*RotorN3(0,1,0,AJLyr)*RotorN3(0,0,1,AJLzr);
+TfootL = TranslatorN3(0, -Hf, 150*x); 
+MfootL = McalfL * RankleL * TfootL;
+PfootL = MfootL * e0 * (~MfootL);
+
+// Pierna derecha
+TlegR = TranslatorN3(0,-Lp,0);
+MlegR = M * ThipR * RhipR * TlegR;
+PkneeR = MlegR * e0 * (~MlegR);
+
+// Rodilla derecha
+RkneeR = RotorN3(1,0,0,KJRxr);
+TcalfR = TranslatorN3(0,-Lc,0);
+McalfR = MlegR * RkneeR * TcalfR;
+PankleR = McalfR * e0 * (~McalfR);
+
+// Tobillo y pie derecho
+RankleR = RotorN3(1,0,0,AJRxr)*RotorN3(0,1,0,AJRyr)*RotorN3(0,0,1,AJRzr);
+TfootR = TranslatorN3(0, -Hf, 150*x); 
+MfootR = McalfR * RankleR * TfootR;
+PfootR = MfootR * e0 * (~MfootR);
+
 // Dibujo cuerpo
-// Cabeza
-Color(1,0.8,0.6);
-DrawSphere(Phead,0.25);
-
-// Torso
-Color(0.7,0.7,0.7);
-Cilindro(Ptorso,Pchest,0.15);
-
-// Brazo
-Color(0,0,1);
-Cilindro(PshoulderL,PelbowL,0.08);
-Cilindro(PelbowL,PhandL,0.06);
-
-// Pierna
+// Articulaciones (Esferas rojas)
 Color(1,0,0);
-Cilindro(PhipL,PkneeL,0.1);
-Cilindro(PkneeL,PankleL,0.08);
+DrawSphere(Ptorso, 0.15); 
+DrawSphere(Pchest, 0.15); 
+DrawSphere(Phead, 0.35); 
 
-// Vectores para caja de "pie"
-Bx = M*VecN3(0.3,0,0)*(~M);
-By = M*VecN3(0,0.1,0)*(~M);
-Bz = M*VecN3(0,0,0.5)*(~M);
+// Uniones lado izquierdo
+DrawSphere(PshoulderL, 0.15); 
+DrawSphere(PelbowL, 0.15); 
+DrawSphere(PhandL, 0.15);
+DrawSphere(PhipL, 0.15); 
+DrawSphere(PkneeL, 0.15); 
+DrawSphere(PankleL, 0.15);
 
-:White;
-:P1 - 1/2*(0.15)^^2*einf;
-//:P2 - 1/2*(0.15)^^2*einf;
-::Box(P2,Bx,By,Bz);
-:Yellow;
-?G = ::Cilindro(O,P1,0.05);
-::Cilindro(P1,P2,0.05);
-?G(1);
+// Uniones lado derecho
+DrawSphere(PshoulderR, 0.15); 
+DrawSphere(PelbowR, 0.15); 
+DrawSphere(PhandR, 0.15);
+DrawSphere(PhipR, 0.15); 
+DrawSphere(PkneeR, 0.15); 
+DrawSphere(PankleR, 0.15);
 
-//*/
+// Huesos (Cilindros azules)
+Color(0,0.5,1);
+
+// Columna central
+Cilindro(Ptorso, Pchest, 0.1);
+Cilindro(Pchest, Phead, 0.1);
+
+// Conexiones de hombros y caderas al centro
+Cilindro(Pchest, PshoulderL, 0.1); 
+Cilindro(Pchest, PshoulderR, 0.1);
+Cilindro(Ptorso, PhipL, 0.1);      
+Cilindro(Ptorso, PhipR, 0.1);
+
+// Brazos
+Cilindro(PshoulderL, PelbowL, 0.1); 
+Cilindro(PelbowL, PhandL, 0.1);
+Cilindro(PshoulderR, PelbowR, 0.1); 
+Cilindro(PelbowR, PhandR, 0.1);
+
+// Piernas
+Cilindro(PhipL, PkneeL, 0.1); 
+Cilindro(PkneeL, PankleL, 0.1);
+Cilindro(PankleL, PfootL, 0.1);
+Cilindro(PhipR, PkneeR, 0.1); 
+Cilindro(PkneeR, PankleR, 0.1);
+Cilindro(PankleR, PfootR, 0.1);
