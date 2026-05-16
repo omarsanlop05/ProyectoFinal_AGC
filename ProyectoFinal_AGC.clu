@@ -2,7 +2,7 @@ DefVarsN3();
 DrawFrame(0.5,"axes");
 
 //*
-//Función cilindro modificada
+//Funcion cilindro modificada
 Cilindro = {
 	//Entrada de datos: _P(#)
 	A = _P(1); //Entrada 1: Punto inicial del cilindro
@@ -12,16 +12,16 @@ Cilindro = {
 	E = einf^e0; //Plano de Minkowski
 	Ae = (A^E)*E; //Quitar parte "conformal" a Punto A
 	Be = (B^E)*E; //Quitar parte "conformal" a Punto B
-	Ce = Be - Ae; //Vector de direcciï¿½n en Euclidiano que va de A a B
+	Ce = Be - Ae; //Vector de direccion en Euclidiano que va de A a B
 	C = Ce + 1/2*Ce^^2*einf + e0; // Vector Ce en conformal
 	DrawCylinder(A,C,r);
 }
 
 Box = {
 	C = _P(1); // Entrada 1: Punto centro de la caja
-	X = _P(2); // Entrada 2: Punto direcciï¿½n 1
-	Y = _P(3); // Entrada 3: Punto direcciï¿½n 2
-	Z = _P(4); // Entrada 4: Punto direcciï¿½n 3
+	X = _P(2); // Entrada 2: Punto direccion 1
+	Y = _P(3); // Entrada 3: Punto direccion 2
+	Z = _P(4); // Entrada 4: Punto direccion 3
 	
 	E = einf^e0; // Plano de Minkowski
 	D1e = ((X-C)^E)*E;
@@ -108,61 +108,61 @@ if(check){
 ////////////////
 	//Movimiento general
 	BFx = Slider("Body Forward X", -5,5,0.1,0);
-	BFy = Slider("Body Forward Y", -5,5,0.1,0);
+	BFy = Slider("Body Forward Y", -5,5,0.1,0.93);
 	BFz = Slider("Body Forward Z", -5,5,0.1,0);
 	BFRx = Slider("Body Rotation X", -Pi,Pi,0.1,0);
 	BFRy = Slider("Body Rotation Y", -Pi,Pi,0.1,0);
 	BFRz = Slider("Body Rotation Z", -Pi,Pi,0.1,0);
 
 //Columna
-	LLJxr = Slider("Lumbar Rotation X", -5,5,0.1,0);
-	LLJzr = Slider("Lumbar Rotation Z", -5,5,0.1,0);
+	LLJxr = Slider("Lumbar Rotation X", -0.6,0.6,0.1,0);
+	LLJzr = Slider("Lumbar Rotation Z", -0.3,0.3,0.1,0);
 
 //Cuello
-	LNJxr = Slider("Neck Rotation X", -5,5,0.1,0);
-	LNJyr = Slider("Neck Rotation Y", -5,5,0.1,0);
+	LNJxr = Slider("Neck Rotation X", -0.6,0.6,0.1,0);
+	LNJyr = Slider("Neck Rotation Y", -Pi/4,Pi/4,0.1,0);
 
 //Hombro izquierdo
-	SJLxr = Slider("Left Shoulder Rotation X", -5,5,0.1,0);
-	SJLyr = Slider("Left Shoulder Rotation Y", -5,5,0.1,0);
-	SJLzr = Slider("Left Shoulder Rotation Z", -5,5,0.1,0);
+	SJLxr = Slider("Left Shoulder Rotation X", -Pi,2,0.1,0);
+	SJLyr = Slider("Left Shoulder Rotation Y", -Pi/4,Pi/4,0.1,0);
+	SJLzr = Slider("Left Shoulder Rotation Z", -Pi,Pi/2,0.1,0);
 
 //Codo izquierdo
-	EJLxr = Slider("Left Elbow Rotation X", -5,5,0.1,0);
+	EJLxr = Slider("Left Elbow Rotation X", -Pi,0,0.1,0);
 
 //Hombro derecho
-	SJRxr = Slider("Right Shoulder Rotation X", -5,5,0.1,0);
-	SJRyr = Slider("Right Shoulder Rotation Y", -5,5,0.1,0);
-	SJRzr = Slider("Right Shoulder Rotation Z", -5,5,0.1,0);
+	SJRxr = Slider("Right Shoulder Rotation X", -Pi,2,0.1,0);
+	SJRyr = Slider("Right Shoulder Rotation Y", -Pi/4,Pi/4,0.1,0);
+	SJRzr = Slider("Right Shoulder Rotation Z", Pi,-Pi/2,0.1,0);
 
 //Codo derecho
-	EJRxr = Slider("Right Elbow Rotation X", -5,5,0.1,0);
+	EJRxr = Slider("Right Elbow Rotation X", -Pi,0,0.1,0);
 
 //Cadera izquierda
-	HJLxr = Slider("Left Hip Rotation X", -5,5,0.1,0);
-	HJLyr = Slider("Left Hip Rotation Y", -5,5,0.1,0);
-	HJLzr = Slider("Left Hip Rotation Z", -5,5,0.1,0);
+	HJLxr = Slider("Left Hip Rotation X", -Pi/1.5,Pi/1.5,0.1,0);
+	HJLyr = Slider("Left Hip Rotation Y", -Pi/2,Pi/2,0.1,0);
+	HJLzr = Slider("Left Hip Rotation Z", -Pi/3,Pi/3,0.1,0);
 
 //Rodilla izquierda
-	KJLxr = Slider("Left Knee Rotation X", -5,5,0.1,0);
+	KJLxr = Slider("Left Knee Rotation X", 0,Pi,0.1,0);
 
 //Tobillo izquierdo
-	AJLxr = Slider("Left Anckle Rotation X", -5,5,0.1,0);
-	AJLyr = Slider("Left Anckle Rotation Y", -5,5,0.1,0);
-	AJLzr = Slider("Left Anckle Rotation Z", -5,5,0.1,0);
+	AJLxr = Slider("Left Anckle Rotation X", -Pi/3,Pi/3,0.1,0);
+	AJLyr = Slider("Left Anckle Rotation Y", -Pi/2,Pi/2,0.1,0);
+	AJLzr = Slider("Left Anckle Rotation Z", -Pi/2,Pi/2,0.1,0);
 
 //Cadera derecha
-	HJRxr = Slider("Right Hip Rotation X", -5,5,0.1,0);
-	HJRyr = Slider("Right Hip Rotation Y", -5,5,0.1,0);
-	HJRzr = Slider("Right Hip Rotation Z", -5,5,0.1,0);
+	HJRxr = Slider("Right Hip Rotation X", -Pi/1.5,Pi/1.5,0.1,0);
+	HJRyr = Slider("Right Hip Rotation Y", -Pi/2,Pi/2,0.1,0);
+	HJRzr = Slider("Right Hip Rotation Z", -Pi/3,Pi/3,0.1,0);
 
 //Rodilla derecha
-	KJRxr = Slider("Right Knee Rotation X", -5,5,0.1,0);
+	KJRxr = Slider("Right Knee Rotation X", 0,Pi,0.1,0);
 
 //Tobillo derecho
-	AJRxr = Slider("Right Anckle Rotation X", -5,5,0.1,0);
-	AJRyr = Slider("Right Anckle Rotation Y", -5,5,0.1,0);
-	AJRzr = Slider("Right Anckle Rotation Z", -5,5,0.1,0);
+	AJRxr = Slider("Right Anckle Rotation X", -Pi/3,Pi/3,0.1,0);
+	AJRyr = Slider("Right Anckle Rotation Y", -Pi/2,Pi/2,0.1,0);
+	AJRzr = Slider("Right Anckle Rotation Z", -Pi/2,Pi/2,0.1,0);
 }
 ////////////////
 
@@ -279,7 +279,6 @@ TfootL = TranslatorN3(0, -Hf, 50*x); // 50*x proyecta el empeine hacia el frente
 MfootL = McalfL * RankleL * TfootL;
 PfootL = MfootL * e0 * (~MfootL);
 
-
 // Pierna derecha
 TlegR = TranslatorN3(0, -Lp, 0);
 MlegR = MhipCenter * ThipR * RhipR * TlegR; 
@@ -301,86 +300,128 @@ PfootR = MfootR * e0 * (~MfootR);
 // DIBUJO DEL CUERPO HUMANOIDE REALISTA
 // ===============================================================
 
-// --- 1. CABEZA Y TORSO EXTRA REALISTAS ---
-// Cabeza estilizada (una esfera grande y una pequeña para simular la mandíbula)
-:Color(0.85, 0.75, 0.65); // Color piel base / neutro
-DrawSphere(Phead, 0.28); 
+// --- 1. CABEZA Y CUELLO ---
+:Color(0.85, 0.75, 0.65); // Tono de piel
 
-// Torso / Pecho (Usamos volúmenes diferenciados para simular masa muscular)
-:Color(0.2, 0.4, 0.8); // Color de la "playera/ropa" (Azul elegante)
-Cilindro(Ptorso, Pchest, 0.22); // Caja torácica robusta
+// Cuello (Conecta el pecho con la base de la cabeza)
+Cilindro(Pchest, Phead, 0.1);
 
-// Hombros / Clavícula (Unión fuerte entre los dos hombros)
+// Cabeza
+DrawSphere(Phead, 0.3);
+
+// --- 2. TORSO Y CADERA ---
+
+:Color(0.2, 0.4, 0.8); // Color de la "playera"
+// Columna central
+Cilindro(Ptorso, Pchest, 0.2); 
+// Clavicula
 Cilindro(PshoulderL, PshoulderR, 0.12);
-// Cadera / Pelvis estructural
-Cilindro(PhipL, PhipR, 0.14);
+
+:Color(0.1, 0.2, 0.5); // Color del "pantalon"
+
+// Triangulo de la cadera
+Cilindro(Ptorso, PhipL, 0.15); // Lado izquierdo de la pelvis
+Cilindro(Ptorso, PhipR, 0.15); // Lado derecho de la pelvis
+
+// Base de la cadera
+Cilindro(PhipL, PhipR, 0.16);
 
 
-// --- 2. EXTREMIDADES SUPERIORES (BRAZOS) ---
-// Articulaciones de los hombros (Deltoides)
-:Color(0.15, 0.35, 0.75);
-DrawSphere(PshoulderL, 0.13);
-DrawSphere(PshoulderR, 0.13);
+// --- 3. EXTREMIDADES SUPERIORES (BRAZOS) ---
+:Color(0.15, 0.35, 0.75); // Mangas de la playera
+// Deltoides (MÃºsculo del hombro)
+DrawSphere(PshoulderL, 0.12);
+DrawSphere(PshoulderR, 0.12);
 
-// Brazos (Bíceps/Tríceps - Más gruesos arriba, se adelgazan hacia el codo)
-:Color(0.85, 0.75, 0.65); // Color piel
-Cilindro(PshoulderL, PelbowL, 0.10); 
-Cilindro(PshoulderR, PelbowR, 0.10); 
+:Color(0.85, 0.75, 0.65); // Tono de piel
+// BÃ­ceps / TrÃ­ceps
+Cilindro(PshoulderL, PelbowL, 0.085); 
+Cilindro(PshoulderR, PelbowR, 0.085); 
 
 // Codos
-:Color(0.8, 0.7, 0.6);
-DrawSphere(PelbowL, 0.09);
-DrawSphere(PelbowR, 0.09);
+DrawSphere(PelbowL, 0.075);
+DrawSphere(PelbowR, 0.075);
 
-// Antebrazos (Estilizados, ligeramente más delgados que el brazo)
-:Color(0.85, 0.75, 0.65);
-Cilindro(PelbowL, PhandL, 0.08);
-Cilindro(PelbowR, PhandR, 0.08);
+// Antebrazos
+Cilindro(PelbowL, PhandL, 0.065);
+Cilindro(PelbowR, PhandR, 0.065);
 
-// Manos (Esferas compactas para simular puños)
-:Color(0.8, 0.7, 0.6);
-DrawSphere(PhandL, 0.07);
-DrawSphere(PhandR, 0.07);
+// Manos
+DrawSphere(PhandL, 0.06);
+DrawSphere(PhandR, 0.06);
 
 
-// --- 3. EXTREMIDADES INFERIORES (PIERNAS) ---
-// Articulaciones de la cadera
-:Color(0.1, 0.2, 0.5); // Color del "pantalón"
+// --- 4. EXTREMIDADES INFERIORES (PIERNAS) ---
+:Color(0.1, 0.2, 0.5); // Color del "pantalÃ³n"
+//ArticulaciÃ³n de la cadera
 DrawSphere(PhipL, 0.14);
 DrawSphere(PhipR, 0.14);
 
-// Muslos (Fémur - Es el músculo más grande, requiere un radio mayor)
-Cilindro(PhipL, PkneeL, 0.15);
-Cilindro(PhipR, PkneeR, 0.15);
+// Muslos
+Cilindro(PhipL, PkneeL, 0.13);
+Cilindro(PhipR, PkneeR, 0.13);
 
-// Rodillas
-:Color(0.15, 0.25, 0.55);
-DrawSphere(PkneeL, 0.12);
-DrawSphere(PkneeR, 0.12);
+:Color(0.15, 0.25, 0.55); // Detalle de la rodilla
+DrawSphere(PkneeL, 0.11);
+DrawSphere(PkneeR, 0.11);
 
-// Pantorrillas (Se van adelgazando hacia el tobillo)
-Cilindro(PkneeL, PankleL, 0.11);
-Cilindro(PkneeR, PankleR, 0.11);
+// Pantorrillas
+Cilindro(PkneeL, PankleL, 0.095);
+Cilindro(PkneeR, PankleR, 0.095);
 
 // Tobillos
-:Color(0.2, 0.2, 0.2); // Color de los "zapatos"
-DrawSphere(PankleL, 0.09);
-DrawSphere(PankleR, 0.09);
+:Color(0.2, 0.2, 0.2); 
+DrawSphere(PankleL, 0.08);
+DrawSphere(PankleR, 0.08);
 
+// --- 5. PIES ---
+:Color(0.15, 0.15, 0.15); // Color calzado
 
-// --- 4. PIES REALISTAS (Utilizando tu función Box) ---
-// En lugar de un cilindro simple, le damos volumen horizontal al pie con cajas orientadas en el espacio
-:Color(0.1, 0.1, 0.1); // Color calzado oscuro
+// Vector de ancho (X)
+T_ancho = TranslatorN3(0.3, 0, 0);
+// Vector de altura del empeine (Y)
+T_alto = TranslatorN3(0, Hf, 0);
+// Vector de talla (Z)
+T_largo = TranslatorN3(0, 0, 0.6);
 
-// Pie Izquierdo: Usamos el tobillo como centro trasero y el punto del pie para la dirección del zapato
-// Definimos vectores de dirección ortogonales usando propiedades del Álgebra Geométrica
-D1_L = PfootL;
-D2_L = PankleL + TranslatorN3(0.08, 0, 0) * e0 * (~TranslatorN3(0.08, 0, 0)); // Ancho del pie
-D3_L = PankleL + TranslatorN3(0, 0.06, 0) * e0 * (~TranslatorN3(0, 0.06, 0)); // Altura del empeine
+// Pie Izquierdo
+D1_L = T_ancho * PankleL * (~T_ancho); 
+D2_L = T_alto * PankleL * (~T_alto);
+D3_L = T_largo * PankleL * (~T_largo); 
 Box(PankleL, D1_L, D2_L, D3_L);
 
 // Pie Derecho
-D1_R = PfootR;
-D2_R = PankleR + TranslatorN3(0.08, 0, 0) * e0 * (~TranslatorN3(0.08, 0, 0));
-D3_R = PankleR + TranslatorN3(0, 0.06, 0) * e0 * (~TranslatorN3(0, 0.06, 0));
+D1_R = T_ancho * PankleR * (~T_ancho); 
+D2_R = T_alto * PankleR * (~T_alto);
+D3_R = T_largo * PankleR * (~T_largo); 
 Box(PankleR, D1_R, D2_R, D3_R);
+
+// ===============================================================
+// ESCENARIO Y ENTORNO DEFINITIVO
+// ===============================================================
+
+// --- 1. Cielo (Color de fondo) ---
+
+:Color(0.5, 0.65, 0.85); // Azul cielo limpio
+DrawSphere(1 * e0, 30.0);
+
+// --- 2. Suelo ---
+:Color(0.45, 0.45, 0.45);
+
+P_origen = 1 * e0;
+T_suelo = TranslatorN3(0,-(Lp+Lc+2*Hf-BFy),0);
+P_origen_suelo = T_suelo * P_origen * (~T_suelo);
+
+// Dimensiones de la plataforma (Largo, Ancho, Grosor)
+T_suelo_ancho = TranslatorN3(15, 0, 0);   // Extension hacia los lados (X)
+T_suelo_largo = TranslatorN3(0, 0, 15);   // Extension hacia adelante/atras (Z)
+T_suelo_grosor = TranslatorN3(0, -0.02, 0);
+
+D1_suelo = T_suelo_ancho * P_origen_suelo * (~T_suelo_ancho);
+D2_suelo = T_suelo_largo * P_origen_suelo * (~T_suelo_largo);
+D3_suelo = T_suelo_grosor * P_origen_suelo * (~T_suelo_grosor);
+
+// Suelo
+Box(P_origen_suelo, D1_suelo, D2_suelo, D3_suelo);
+
+
