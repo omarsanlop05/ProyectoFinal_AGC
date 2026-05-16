@@ -15,14 +15,13 @@ Cilindro = {
 	Ce = Be - Ae; //Vector de direcciï¿½n en Euclidiano que va de A a B
 	C = Ce + 1/2*Ce^^2*einf + e0; // Vector Ce en conformal
 	DrawCylinder(A,C,r);
-	[C,Ce,"Hola"] // Salida(s)
 }
 
 Box = {
 	C = _P(1); // Entrada 1: Punto centro de la caja
-	X = _P(2); // Entrada 2: Punto dirección 1
-	Y = _P(3); // Entrada 3: Punto dirección 2
-	Z = _P(4); // Entrada 4: Punto dirección 3
+	X = _P(2); // Entrada 2: Punto direcciï¿½n 1
+	Y = _P(3); // Entrada 3: Punto direcciï¿½n 2
+	Z = _P(4); // Entrada 4: Punto direcciï¿½n 3
 	
 	E = einf^e0; // Plano de Minkowski
 	D1e = ((X-C)^E)*E;
@@ -38,15 +37,14 @@ Box = {
 check = CheckBox("Animar",false);
 EnableAnimate(check);
 
-if(ExecMode & !EM_ANIMATE)
-{
-	Data = ReadData("datos.dat");
-	?N = Size(Data);
+if (ExecMode & !EM_ANIMATE) {
+    Data = ReadData("datos.dat");
+    ?N = Size(Data);
 }
 
 if(check){
 //Numero de elementos de la lista
-	?i = round(Time*200,0)%N+1;
+	?i = floor(Time*200)%N+1;
 	
 ////////////////
 //Movimiento general
@@ -169,26 +167,40 @@ if(check){
 ////////////////
 
 //Motor global
-Mg = TranslatorN3(BFx,BFy,BFz)*RotorN3(1,0,0,BFRx)*RotorN3(0,1,0,BFRy)*RotorN3(1,0,0,BFRz);
+Mg = TranslatorN3(BFx,BFy,BFz)*RotorN3(1,0,0,BFRx)*RotorN3(0,1,0,BFRy)*RotorN3(0,0,1,BFRz);
 M = Mg; //motor auxiliar "acumulado"
 
 ////////////////
 
 // Cuerpo
-x = 0.01; // Escala 1 = mm
+x = 0.005; // Escala 1 = mm
 Ptorso = M*e0*(~M); //Punto inicial (origen)
+
+// ===============================
+// MEDIDAS HUMANOIDE
+// ===============================
+
 Lt = 409.4*x;   // torso
-Ln = 120*x;		// cuello
-Ls = 176.3*x;   // hombros
+Ln = 120*x;     // cuello
+
+Ls = 176.3*x;   // medio ancho hombros
 La = 239.3*x;   // brazo
 Lf = 250*x;     // antebrazo
-Lh = 186.7*x; 	// ancho cadera
-Hh = 119.8*x; 	// altura cadera
-Lp = 380.6*x;   // pierna
+
+Lh = 186.7*x;   // medio ancho cadera
+Hh = 119.8*x;   // altura cadera
+
+Lp = 380.6*x;   // muslo
 Lc = 358.6*x;   // pantorrilla
-Sk = 207.9*x;   // separación rodillas
-Sa = 211.6*x;   // separación tobillos
-Hf = 71.8*x;	// altura pues
+
+Sk = (207.9-186.7)*x;   // separaciÃ³n rodillas
+Sa = (211.6-186.7)*x;   // separaciÃ³n tobillos
+
+Hf = 71.8*x;    // altura pie
+
+// ===============================================================
+//  TRONCO Y EXTREMIDADES SUPERIORES
+// ===============================================================
 
 // Movimiento lumbar
 Rlumbar = RotorN3(1,0,0,LLJxr)*RotorN3(0,0,1,LLJzr);
@@ -205,11 +217,11 @@ Phead = Mneck * e0 * (~Mneck);
 
 // Movimiento brazo izquierdo
 // Hombro izquierdo
-TshoulderL = TranslatorN3(-0.5, Lt, 0);
+TshoulderL = TranslatorN3(-Ls, 0, 0);
 RshoulderL = RotorN3(1,0,0,SJLxr)*RotorN3(0,1,0,SJLyr)*RotorN3(0,0,1,SJLzr);
 TarmL = TranslatorN3(0,-La,0);
-MarmL = M * TshoulderL * RshoulderL * TarmL;
-PshoulderL = (M * TshoulderL) * e0 * (~(M * TshoulderL));
+MarmL = Mtorso * TshoulderL * RshoulderL * TarmL;
+PshoulderL = (Mtorso * TshoulderL) * e0 * (~(Mtorso * TshoulderL));
 PelbowL = MarmL * e0 * (~MarmL);
 
 // Codo izquierdo
@@ -220,11 +232,11 @@ PhandL = MforearmL * e0 * (~MforearmL);
 
 // Movimiento brazo derecho
 // Hombro derecho
-TshoulderR = TranslatorN3(0.5, Lt, 0);
+TshoulderR = TranslatorN3(Ls, 0, 0);
 RshoulderR = RotorN3(1,0,0,SJRxr)*RotorN3(0,1,0,SJRyr)*RotorN3(0,0,1,SJRzr);
 TarmR = TranslatorN3(0,-La,0);
-MarmR = M * TshoulderR * RshoulderR * TarmR;
-PshoulderR = (M * TshoulderR) * e0 * (~(M * TshoulderR));
+MarmR = Mtorso * TshoulderR * RshoulderR * TarmR;
+PshoulderR = (Mtorso * TshoulderR) * e0 * (~(Mtorso * TshoulderR));
 PelbowR = MarmR * e0 * (~MarmR);
 
 // Codo derecho
@@ -233,95 +245,142 @@ TforearmR = TranslatorN3(0,-Lf,0);
 MforearmR = MarmR * RelbowR * TforearmR;
 PhandR = MforearmR * e0 * (~MforearmR);
 
-// Cadera
-ThipL = TranslatorN3(-0.3,0,0);
-RhipL = RotorN3(1,0,0,HJLxr)*RotorN3(0,1,0,HJLyr)*RotorN3(0,0,1,HJLzr);
-PhipL = (M * ThipL) * e0 * (~(M * ThipL));
-ThipR = TranslatorN3(0.3,0,0); // 0.3 positivo
-RhipR = RotorN3(1,0,0,HJRxr)*RotorN3(0,1,0,HJRyr)*RotorN3(0,0,1,HJRzr);
-PhipR = (M * ThipR) * e0 * (~(M * ThipR));
+// ===============================================================
+// CADERA Y EXTREMIDADES INFERIORES
+// ===============================================================
 
-// Movimiento piernas
+ThipCenter = TranslatorN3(0, -Hh, 0);
+MhipCenter = M * ThipCenter;
+
+// Cadera Izquierda
+ThipL = TranslatorN3(-(Lh/2), 0, 0);
+RhipL = RotorN3(1,0,0,HJLxr)*RotorN3(0,1,0,HJLyr)*RotorN3(0,0,1,HJLzr);
+PhipL = (MhipCenter * ThipL) * e0 * (~(MhipCenter * ThipL));
+
+// Cadera Derecha
+ThipR = TranslatorN3((Lh/2), 0, 0); 
+RhipR = RotorN3(1,0,0,HJRxr)*RotorN3(0,1,0,HJRyr)*RotorN3(0,0,1,HJRzr);
+PhipR = (MhipCenter * ThipR) * e0 * (~(MhipCenter * ThipR));
+
 // Pierna izquierda
-TlegL = TranslatorN3(0,-Lp,0);
-MlegL = M * ThipL * RhipL * TlegL;
+TlegL = TranslatorN3(0, -Lp, 0);
+MlegL = MhipCenter * ThipL * RhipL * TlegL;
 PkneeL = MlegL * e0 * (~MlegL);
 
 // Rodilla izquierda
 RkneeL = RotorN3(1,0,0,KJLxr);
-TcalfL = TranslatorN3(0,-Lc,0);
+TcalfL = TranslatorN3(0, -Lc, 0);
 McalfL = MlegL * RkneeL * TcalfL;
 PankleL = McalfL * e0 * (~McalfL);
 
-// Tobillo y pie izquierdo
+// Tobillo Izquierdo
 RankleL = RotorN3(1,0,0,AJLxr)*RotorN3(0,1,0,AJLyr)*RotorN3(0,0,1,AJLzr);
-TfootL = TranslatorN3(0, -Hf, 150*x); 
+TfootL = TranslatorN3(0, -Hf, 50*x); // 50*x proyecta el empeine hacia el frente en Z
 MfootL = McalfL * RankleL * TfootL;
 PfootL = MfootL * e0 * (~MfootL);
 
+
 // Pierna derecha
-TlegR = TranslatorN3(0,-Lp,0);
-MlegR = M * ThipR * RhipR * TlegR;
+TlegR = TranslatorN3(0, -Lp, 0);
+MlegR = MhipCenter * ThipR * RhipR * TlegR; 
 PkneeR = MlegR * e0 * (~MlegR);
 
-// Rodilla derecha
+// Rodilla Derecha
 RkneeR = RotorN3(1,0,0,KJRxr);
-TcalfR = TranslatorN3(0,-Lc,0);
+TcalfR = TranslatorN3(0, -Lc, 0);
 McalfR = MlegR * RkneeR * TcalfR;
 PankleR = McalfR * e0 * (~McalfR);
 
-// Tobillo y pie derecho
+// Tobillo Derecho 
 RankleR = RotorN3(1,0,0,AJRxr)*RotorN3(0,1,0,AJRyr)*RotorN3(0,0,1,AJRzr);
-TfootR = TranslatorN3(0, -Hf, 150*x); 
+TfootR = TranslatorN3(0, -Hf, 50*x); 
 MfootR = McalfR * RankleR * TfootR;
 PfootR = MfootR * e0 * (~MfootR);
 
-// Dibujo cuerpo
-// Articulaciones (Esferas rojas)
-Color(1,0,0);
-DrawSphere(Ptorso, 0.15); 
-DrawSphere(Pchest, 0.15); 
-DrawSphere(Phead, 0.35); 
+// ===============================================================
+// DIBUJO DEL CUERPO HUMANOIDE REALISTA
+// ===============================================================
 
-// Uniones lado izquierdo
-DrawSphere(PshoulderL, 0.15); 
-DrawSphere(PelbowL, 0.15); 
-DrawSphere(PhandL, 0.15);
-DrawSphere(PhipL, 0.15); 
-DrawSphere(PkneeL, 0.15); 
-DrawSphere(PankleL, 0.15);
+// --- 1. CABEZA Y TORSO EXTRA REALISTAS ---
+// Cabeza estilizada (una esfera grande y una pequeña para simular la mandíbula)
+:Color(0.85, 0.75, 0.65); // Color piel base / neutro
+DrawSphere(Phead, 0.28); 
 
-// Uniones lado derecho
-DrawSphere(PshoulderR, 0.15); 
-DrawSphere(PelbowR, 0.15); 
-DrawSphere(PhandR, 0.15);
-DrawSphere(PhipR, 0.15); 
-DrawSphere(PkneeR, 0.15); 
-DrawSphere(PankleR, 0.15);
+// Torso / Pecho (Usamos volúmenes diferenciados para simular masa muscular)
+:Color(0.2, 0.4, 0.8); // Color de la "playera/ropa" (Azul elegante)
+Cilindro(Ptorso, Pchest, 0.22); // Caja torácica robusta
 
-// Huesos (Cilindros azules)
-Color(0,0.5,1);
+// Hombros / Clavícula (Unión fuerte entre los dos hombros)
+Cilindro(PshoulderL, PshoulderR, 0.12);
+// Cadera / Pelvis estructural
+Cilindro(PhipL, PhipR, 0.14);
 
-// Columna central
-Cilindro(Ptorso, Pchest, 0.1);
-Cilindro(Pchest, Phead, 0.1);
 
-// Conexiones de hombros y caderas al centro
-Cilindro(Pchest, PshoulderL, 0.1); 
-Cilindro(Pchest, PshoulderR, 0.1);
-Cilindro(Ptorso, PhipL, 0.1);      
-Cilindro(Ptorso, PhipR, 0.1);
+// --- 2. EXTREMIDADES SUPERIORES (BRAZOS) ---
+// Articulaciones de los hombros (Deltoides)
+:Color(0.15, 0.35, 0.75);
+DrawSphere(PshoulderL, 0.13);
+DrawSphere(PshoulderR, 0.13);
 
-// Brazos
-Cilindro(PshoulderL, PelbowL, 0.1); 
-Cilindro(PelbowL, PhandL, 0.1);
-Cilindro(PshoulderR, PelbowR, 0.1); 
-Cilindro(PelbowR, PhandR, 0.1);
+// Brazos (Bíceps/Tríceps - Más gruesos arriba, se adelgazan hacia el codo)
+:Color(0.85, 0.75, 0.65); // Color piel
+Cilindro(PshoulderL, PelbowL, 0.10); 
+Cilindro(PshoulderR, PelbowR, 0.10); 
 
-// Piernas
-Cilindro(PhipL, PkneeL, 0.1); 
-Cilindro(PkneeL, PankleL, 0.1);
-Cilindro(PankleL, PfootL, 0.1);
-Cilindro(PhipR, PkneeR, 0.1); 
-Cilindro(PkneeR, PankleR, 0.1);
-Cilindro(PankleR, PfootR, 0.1);
+// Codos
+:Color(0.8, 0.7, 0.6);
+DrawSphere(PelbowL, 0.09);
+DrawSphere(PelbowR, 0.09);
+
+// Antebrazos (Estilizados, ligeramente más delgados que el brazo)
+:Color(0.85, 0.75, 0.65);
+Cilindro(PelbowL, PhandL, 0.08);
+Cilindro(PelbowR, PhandR, 0.08);
+
+// Manos (Esferas compactas para simular puños)
+:Color(0.8, 0.7, 0.6);
+DrawSphere(PhandL, 0.07);
+DrawSphere(PhandR, 0.07);
+
+
+// --- 3. EXTREMIDADES INFERIORES (PIERNAS) ---
+// Articulaciones de la cadera
+:Color(0.1, 0.2, 0.5); // Color del "pantalón"
+DrawSphere(PhipL, 0.14);
+DrawSphere(PhipR, 0.14);
+
+// Muslos (Fémur - Es el músculo más grande, requiere un radio mayor)
+Cilindro(PhipL, PkneeL, 0.15);
+Cilindro(PhipR, PkneeR, 0.15);
+
+// Rodillas
+:Color(0.15, 0.25, 0.55);
+DrawSphere(PkneeL, 0.12);
+DrawSphere(PkneeR, 0.12);
+
+// Pantorrillas (Se van adelgazando hacia el tobillo)
+Cilindro(PkneeL, PankleL, 0.11);
+Cilindro(PkneeR, PankleR, 0.11);
+
+// Tobillos
+:Color(0.2, 0.2, 0.2); // Color de los "zapatos"
+DrawSphere(PankleL, 0.09);
+DrawSphere(PankleR, 0.09);
+
+
+// --- 4. PIES REALISTAS (Utilizando tu función Box) ---
+// En lugar de un cilindro simple, le damos volumen horizontal al pie con cajas orientadas en el espacio
+:Color(0.1, 0.1, 0.1); // Color calzado oscuro
+
+// Pie Izquierdo: Usamos el tobillo como centro trasero y el punto del pie para la dirección del zapato
+// Definimos vectores de dirección ortogonales usando propiedades del Álgebra Geométrica
+D1_L = PfootL;
+D2_L = PankleL + TranslatorN3(0.08, 0, 0) * e0 * (~TranslatorN3(0.08, 0, 0)); // Ancho del pie
+D3_L = PankleL + TranslatorN3(0, 0.06, 0) * e0 * (~TranslatorN3(0, 0.06, 0)); // Altura del empeine
+Box(PankleL, D1_L, D2_L, D3_L);
+
+// Pie Derecho
+D1_R = PfootR;
+D2_R = PankleR + TranslatorN3(0.08, 0, 0) * e0 * (~TranslatorN3(0.08, 0, 0));
+D3_R = PankleR + TranslatorN3(0, 0.06, 0) * e0 * (~TranslatorN3(0, 0.06, 0));
+Box(PankleR, D1_R, D2_R, D3_R);
