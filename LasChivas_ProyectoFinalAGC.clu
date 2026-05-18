@@ -216,6 +216,10 @@ Tneck = TranslatorN3(0,Ln,0);
 Mneck = Mtorso * Rneck * Tneck;
 Phead = Mneck * e0 * (~Mneck);
 
+// Punto de la Nariz 
+Tnose = TranslatorN3(0, 0, 0.35); 
+Pnose = (Mneck * Tnose) * e0 * (~(Mneck * Tnose));
+
 // Movimiento brazo izquierdo
 // Hombro izquierdo
 TshoulderL = TranslatorN3(-Ls, 0, 0);
@@ -245,6 +249,16 @@ RelbowR = RotorN3(1,0,0,EJRxr);
 TforearmR = TranslatorN3(0,-Lf,0);
 MforearmR = MarmR * RelbowR * TforearmR;
 PhandR = MforearmR * e0 * (~MforearmR);
+
+// Puntos para los "bastones" en las manos
+ThandDir1 = TranslatorN3(0, 0, 0.4);
+ThandDir2 = TranslatorN3(0, 0, -0.4);
+
+PbatonL1 = (MforearmL * ThandDir1) * e0 * (~(MforearmL * ThandDir1));
+PbatonL2 = (MforearmL * ThandDir2) * e0 * (~(MforearmL * ThandDir2));
+
+PbatonR1 = (MforearmR * ThandDir1) * e0 * (~(MforearmR * ThandDir1));
+PbatonR2 = (MforearmR * ThandDir2) * e0 * (~(MforearmR * ThandDir2));
 
 // ===============================================================
 // CADERA Y EXTREMIDADES INFERIORES
@@ -310,6 +324,10 @@ Cilindro(Pchest, Phead, 0.1);
 // Cabeza
 DrawSphere(Phead, 0.3);
 
+// Nariz
+:Color(0.9, 0.4, 0.3); 
+DrawSphere(Pnose, 0.08);
+
 // --- 2. TORSO Y CADERA ---
 
 :Color(0.2, 0.4, 0.8); // Color de la "playera"
@@ -351,6 +369,10 @@ Cilindro(PelbowR, PhandR, 0.065);
 DrawSphere(PhandL, 0.06);
 DrawSphere(PhandR, 0.06);
 
+// Bastones en las manos
+:Color(0.8, 0.8, 0.2);
+Cilindro(PbatonL1, PbatonL2, 0.03);
+Cilindro(PbatonR1, PbatonR2, 0.03);
 
 // --- 4. EXTREMIDADES INFERIORES (PIERNAS) ---
 :Color(0.1, 0.2, 0.5); // Color del "pantalon"
