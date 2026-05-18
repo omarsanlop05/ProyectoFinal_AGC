@@ -37,8 +37,11 @@ Box = {
 check = CheckBox("Animar",false);
 EnableAnimate(check);
 
-Data = ReadData("datos.dat");
-    ?N = Size(Data);
+if(ExecMode & EM_CHANGE)
+{
+	Data = ReadData("datos.dat");
+	?N = Size(Data);
+}
 
 if(check){
 //Numero de elementos de la lista
