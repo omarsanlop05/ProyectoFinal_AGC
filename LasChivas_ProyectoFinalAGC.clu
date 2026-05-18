@@ -37,10 +37,8 @@ Box = {
 check = CheckBox("Animar",false);
 EnableAnimate(check);
 
-if (ExecMode & !EM_ANIMATE) {
-    Data = ReadData("datos.dat");
+Data = ReadData("datos.dat");
     ?N = Size(Data);
-}
 
 if(check){
 //Numero de elementos de la lista
@@ -329,12 +327,12 @@ Cilindro(PhipL, PhipR, 0.16);
 
 // --- 3. EXTREMIDADES SUPERIORES (BRAZOS) ---
 :Color(0.15, 0.35, 0.75); // Mangas de la playera
-// Deltoides (Músculo del hombro)
+// Deltoides (Musculo del hombro)
 DrawSphere(PshoulderL, 0.12);
 DrawSphere(PshoulderR, 0.12);
 
 :Color(0.85, 0.75, 0.65); // Tono de piel
-// Bíceps / Tríceps
+// Biceps / Triceps
 Cilindro(PshoulderL, PelbowL, 0.085); 
 Cilindro(PshoulderR, PelbowR, 0.085); 
 
@@ -352,8 +350,8 @@ DrawSphere(PhandR, 0.06);
 
 
 // --- 4. EXTREMIDADES INFERIORES (PIERNAS) ---
-:Color(0.1, 0.2, 0.5); // Color del "pantalón"
-//Articulación de la cadera
+:Color(0.1, 0.2, 0.5); // Color del "pantalon"
+//Articulacion de la cadera
 DrawSphere(PhipL, 0.14);
 DrawSphere(PhipR, 0.14);
 
