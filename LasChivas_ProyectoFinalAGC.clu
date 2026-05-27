@@ -45,7 +45,7 @@ if(ExecMode & EM_CHANGE)
 
 if(check){
 //Numero de elementos de la lista
-	?i = floor(Time*200)%N+1;
+	?i = floor(Time*150)%N+1;
 	
 ////////////////
 //Movimiento general
@@ -398,25 +398,38 @@ DrawSphere(PankleL, 0.08);
 DrawSphere(PankleR, 0.08);
 
 // --- 5. PIES ---
-:Color(0.15, 0.15, 0.15); // Color calzado
+:Color(0.15, 0.15, 0.15);
 
-// Vector de ancho (X)
-T_ancho = TranslatorN3(0.3, 0, 0);
-// Vector de altura del empeine (Y)
-T_alto = TranslatorN3(0, Hf, 0);
-// Vector de talla (Z)
-T_largo = TranslatorN3(0, 0, 0.6);
+// Pie izquierdo
 
-// Pie Izquierdo
-D1_L = T_ancho * PankleL * (~T_ancho); 
-D2_L = T_alto * PankleL * (~T_alto);
-D3_L = T_largo * PankleL * (~T_largo); 
+// Rotor puro del pie
+RfootL = Mg * RhipL * RkneeL * RankleL;
+
+// Direcciones locales rotadas
+vxL = RfootL * e1 * (~RfootL);
+vyL = RfootL * e2 * (~RfootL);
+vzL = RfootL * e3 * (~RfootL);
+
+// Puntos direccionales desde el tobillo
+D1_L = PankleL + 0.15 * vxL;
+D2_L = PankleL + Hf*0.5 * vyL;
+D3_L = PankleL + 0.5 * vzL;
+
 Box(PankleL, D1_L, D2_L, D3_L);
 
-// Pie Derecho
-D1_R = T_ancho * PankleR * (~T_ancho); 
-D2_R = T_alto * PankleR * (~T_alto);
-D3_R = T_largo * PankleR * (~T_largo); 
+
+// Pie izquierdo
+
+RfootR = Mg * RhipR * RkneeR * RankleR;
+
+vxR = RfootR * e1 * (~RfootR);
+vyR = RfootR * e2 * (~RfootR);
+vzR = RfootR * e3 * (~RfootR);
+
+D1_R = PankleR + 0.15 * vxR;
+D2_R = PankleR + Hf*0.5 * vyR;
+D3_R = PankleR + 0.5 * vzR;
+
 Box(PankleR, D1_R, D2_R, D3_R);
 
 // ===============================================================
